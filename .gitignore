@@ -167,3 +167,5 @@ dist
 .wrangler/
 
 tmp/
+
+wrangler.jsonc
