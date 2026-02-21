@@ -26,16 +26,6 @@ describe('Hello World worker', () => {
 describe('URL shortener', () => {
   beforeAll(async () => {
     await env.dev_husky_fetch
-      .prepare(
-        `CREATE TABLE IF NOT EXISTS url (
-          url_id INTEGER PRIMARY KEY,
-          url TEXT,
-          short_alias TEXT,
-          created_at TEXT
-        )`
-      )
-      .run();
-    await env.dev_husky_fetch
       .prepare(`INSERT INTO url (url_id, url, short_alias, created_at) VALUES (?, ?, ?, ?)`)
       .bind(1, 'https://www.google.com', 'g', '2026-02-19 12:00:00')
       .run();
