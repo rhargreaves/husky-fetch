@@ -11,20 +11,20 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
-export default {
-  async fetch(request, env, ctx): Promise<Response> {
-    const { pathname } = new URL(request.url);
+import { Hono } from "hono";
 
-    if (pathname === '/') {
-      return new Response('Hello World!');
-    }
+const app = new Hono<{ Bindings: Env }>()
 
-    const shortAlias = pathname.slice(1);
-    const query = await env.dev_husky_fetch.prepare('SELECT url FROM url WHERE short_alias = ?');
-    const result = await query.bind(shortAlias).first();
-    if (!result) {
-      return new Response('URL not found', { status: 404 });
-    }
-    return Response.redirect(result.url, 302);
-  },
-} satisfies ExportedHandler<Env>;
+app.get('/', (c) => c.text('Husky Fetch is running'));
+
+app.get('/:shortAlias', async (c) => {
+  const shortAlias = c.req.param('shortAlias');
+  const query = await c.env.dev_husky_fetch.prepare('SELECT url FROM url WHERE short_alias = ?');
+  const result = await query.bind(shortAlias).first();
+  if (!result) {
+    return c.text('URL not found', { status: 404 });
+  }
+  return c.redirect(result.url as string, 302);
+});
+
+export default app;
